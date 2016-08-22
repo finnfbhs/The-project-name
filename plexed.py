@@ -11,10 +11,22 @@ def loading():
     for row in cursor:
         name = row[0]
     print(name)
-    cursor = con.execute("SELECT Name from Save")
+    
+    cursor = con.execute("SELECT Weapon from Save")
     for row in cursor:
-        name = row[0]
-    print(name)    
+        weaponID = row[0]
+        weaponcur = con.execute("SELECT * from Weapons where ID = {0}".format(weaponID))
+        for row in weaponcur:
+            weapon = [row[0],row[1],row[2]]
+    print(weapon)
+    
+    cursor = con.execute("SELECT Armour from Save")
+    for row in cursor:
+        armourID = row[0]
+        armourcur = con.execute("SELECT * from Armours where ID = {0}".format(armourID))
+        for row in armourcur:
+            armour = [row[0],row[1],row[2]]
+    print(armour)
 
 #def saving():
     
