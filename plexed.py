@@ -4,38 +4,76 @@
 
 import sqlite3
 import random
+import time
 con = sqlite3.connect('database.db')
 
 def loading():
-    cursor = con.execute("SELECT Name from Save")
+    print("0 Create new save")
+    print("Saves:")
+    cursor = con.execute("SELECT SaveID,Name from Save")
     for row in cursor:
-        name = row[0]
-    print(name)
+        print(row[0],row[1])
+    answer = int(input("What save would you like to load?(type the number)"))
     
-    cursor = con.execute("SELECT Weapon from Save")
-    for row in cursor:
-        weaponID = row[0]
-        weaponcur = con.execute("SELECT * from Weapons where ID = {0}".format(weaponID))
-        for row in weaponcur:
-            weapon = [row[0],row[1],row[2]]
-    print(weapon)
-    
-    cursor = con.execute("SELECT Armour from Save")
-    for row in cursor:
-        armourID = row[0]
-        armourcur = con.execute("SELECT * from Armours where ID = {0}".format(armourID))
-        for row in armourcur:
-            armour = [row[0],row[1],row[2]]
-    print(armour)
+    if answer == 0:
+        newSave()
+        
+    else:
+        cursor = con.execute("SELECT Name from Save where SaveID = {0}".format(answer))
+        for row in cursor:
+            name = row[0]
+        print("Name = {0}".format(name))
+        
+        cursor = con.execute("SELECT Weapon from Save where SaveID = {0}".format(answer))
+        for row in cursor:
+            weaponID = row[0]
+            weaponcur = con.execute("SELECT * from Weapons where ID = {0}".format(weaponID))
+            for row in weaponcur:
+                weapon = [row[0],row[1],row[2]]
+        print("Weapon = {0}".format(weapon[1]))
+        
+        cursor = con.execute("SELECT Armour from Save where SaveID = {0}".format(answer))
+        for row in cursor:
+            armourID = row[0]
+            armourcur = con.execute("SELECT * from Armours where ID = {0}".format(armourID))
+            for row in armourcur:
+                armour = [row[0],row[1],row[2]]
+        print("Armour = {0}".format(armour[1]))
 
-#def saving():
-    
+def newSave():
+    name = input("What is your name?")
+    details = (name,1,1)
 
-#def introduction():
+    cursor = con.cursor()
+    cursor.execute("INSERT INTO Save(Name,Weapon,Armour) VALUES (?,?,?)",details)
+    con.commit()
     
+    weapon = [1, "Scalpel", 5]
+    armour = [1, "Ripped Lab Coat", 4]
+    
+    print("You wake up. Everything is very hazy.")
+    time.sleep(3)
+    print("Regaining vision you see that you're in some kind of medical room.")
+    time.sleep(3)
+    print("You see an empty syringe on the ground next to you labelled HALLUCINOGENS")
+    time.sleep(3)
+    print("Looking at your arm you see needle holes. You've been given hallucinogens!")
+    time.sleep(3)
+    print("You find a Scalpel and a Ripped Lab Coat so you grab them. Maybe they could be of use.")
+    time.sleep(3)
+    print("You need to find a way out!")
+    time.sleep(3)    
 
-#def final():
+def saving():
+    weaponID = weapon[0]
+    armourID = armour[0]
     
+    cursor = con.cursor()
+    cursor.execute("UPDATE Save SET Weapon = ?, Armour = ? WHERE SaveID= ?",(weaponID, armourID, saveID))
+    con.commit()   
+
+def final():
+    print("")
 
 #def combat():
     
@@ -51,6 +89,9 @@ def loading():
 
 #def rest():
     
+
+#def checkStats():
+
 
 def main():
     loading()
