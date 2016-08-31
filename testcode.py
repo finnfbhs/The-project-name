@@ -43,22 +43,33 @@ print("opened database successfully")
         #roomDes = row[1]
     #print(roomDes)
 
-def dropGen():
-    randNumber = random.randint(1,10)
-    print(randNumber)
-    decider = random.randint(1,2)
-    print(decider)
-    if decider == 1:
-        cursor = con.cursor()
-        var = cursor.execute("SELECT * from Armours where ID = {0}".format(randNumber))
-        for row in var:
-            droplist = (row[0],row[1],row[2])
-        print(droplist)
-    else:
-        cursor = con.cursor()
-        var = cursor.execute("SELECT * from Weapons where ID = {0}".format(randNumber))
-        for row in var:
-            droplist = (row[0],row[1],row[2])
-        print(droplist)
+#def dropGen():
+    #randNumber = random.randint(1,10)
+    #print(randNumber)
+    #decider = random.randint(1,2)
+    #print(decider)
+    #if decider == 1:
+        #cursor = con.cursor()
+        #var = cursor.execute("SELECT * from Armours where ID = {0}".format(randNumber))
+        #for row in var:
+            #droplist = (row[0],row[1],row[2])
+        #print(droplist)
+    #else:
+        #cursor = con.cursor()
+        #var = cursor.execute("SELECT * from Weapons where ID = {0}".format(randNumber))
+        #for row in var:
+            #droplist = (row[0],row[1],row[2])
+        #print(droplist)
+    #print("Operation Successful")
+    
+def delete():
+    print("Saves:")
+    cursor = con.execute("SELECT SaveID,Name from Save")
+    for row in cursor:
+        print(row[0],row[1])
+    ID = int(input("What save would you like to delete? (Enter the save number)"))
+    cursor = con.cursor()
+    cursor.execute("DELETE FROM Save where SaveID = {0}".format(ID))
+    con.commit()
     print("Operation Successful")
-dropGen()
+delete()

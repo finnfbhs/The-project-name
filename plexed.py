@@ -8,16 +8,20 @@ import time
 con = sqlite3.connect('database.db')
 
 def loading():
-    print("0 Create new save")
     print("Saves:")
     cursor = con.execute("SELECT SaveID,Name from Save")
     for row in cursor:
         print(row[0],row[1])
-    answer = int(input("What save would you like to load?(type the number)"))
+    answer = int(input("To create a new save enter '0', to load a save enter the save number, to delete a save enter '-1'."))
     
     if answer == 0:
         newSave()
-        
+    
+    elif answer == -1:
+        answer = input("Are you sure? (yes/no)")
+        if answer == "yes":
+            deleteSave()
+    
     else:
         cursor = con.execute("SELECT Name from Save where SaveID = {0}".format(answer))
         for row in cursor:
@@ -59,6 +63,10 @@ def newSave():
     time.sleep(3)
     print("Looking at your arm you see needle holes. You've been given hallucinogens!")
     time.sleep(3)
+    print("These may affect the world around you. Rooms you have just came out of may have changed.")
+    time.sleep(3)
+    print("Things are hard to see and nothing makes sense.")
+    time.sleep(3)
     print("You find a Scalpel and a Ripped Lab Coat so you grab them. Maybe they could be of use.")
     time.sleep(3)
     print("You need to find a way out!")
@@ -71,6 +79,18 @@ def saving():
     cursor = con.cursor()
     cursor.execute("UPDATE Save SET Weapon = ?, Armour = ? WHERE SaveID= ?",(weaponID, armourID, saveID))
     con.commit()   
+
+def deleteSave():
+    print("Saves:")
+    cursor = con.execute("SELECT SaveID,Name from Save")
+    for row in cursor:
+        print(row[0],row[1])
+    
+    ID = int(input("What save would you like to delete? (Enter the save number)"))
+    cursor = con.cursor()
+    cursor.execute("DELETE FROM Save where SaveID = {0}".format(ID))
+    con.commit()
+    print("Save {0} deleted successfully".format(ID))
 
 def final():
     print("")
