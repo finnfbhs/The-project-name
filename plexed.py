@@ -78,8 +78,14 @@ def final():
 #def combat():
     
 
-#def roomGen():
-    
+def roomGen():
+    randNumber = random.randint(1,30)
+
+    cursor = con.cursor()
+    var = cursor.execute("SELECT * from RoomGen WHERE desID = {0}".format(randNumber))
+    for row in var:
+        roomDes = row[1]
+    return roomDes
 
 #def enemyStatGen():
     
@@ -95,5 +101,6 @@ def final():
 
 def main():
     loading()
+    
 
 main()
