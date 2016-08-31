@@ -8,6 +8,10 @@ import time
 con = sqlite3.connect('database.db')
 
 def loading():
+    global name
+    global weapon
+    global armour
+    
     print("Saves:")
     cursor = con.execute("SELECT SaveID,Name from Save")
     for row in cursor:
@@ -45,6 +49,10 @@ def loading():
         print("Armour = {0}".format(armour[1]))
 
 def newSave():
+    global name
+    global weapon
+    global armour
+    
     name = input("What is your name?")
     details = (name,1,1)
 
@@ -136,7 +144,8 @@ def dropGen():
 
 
 def main():
+    print("Plexed")
+    time.sleep(3)
     loading()
-    
 
 main()
