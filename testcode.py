@@ -34,13 +34,31 @@ print("opened database successfully")
     #con.commit()
     #print("operation successful")
 
-def roomGen():
-    randNumber = random.randint(1,30)
-    print(randNumber)
-    cursor = con.cursor()
-    var = cursor.execute("SELECT * from RoomGen WHERE desID = {0}".format(randNumber))
-    for row in var:
-        roomDes = row[1]
-    print(roomDes)
+#def roomGen():
+    #randNumber = random.randint(1,30)
+    #print(randNumber)
+    #cursor = con.cursor()
+    #var = cursor.execute("SELECT * from RoomGen WHERE desID = {0}".format(randNumber))
+    #for row in var:
+        #roomDes = row[1]
+    #print(roomDes)
 
-roomGen()
+def dropGen():
+    randNumber = random.randint(1,10)
+    print(randNumber)
+    decider = random.randint(1,2)
+    print(decider)
+    if decider == 1:
+        cursor = con.cursor()
+        var = cursor.execute("SELECT * from Armours where ID = {0}".format(randNumber))
+        for row in var:
+            droplist = (row[0],row[1],row[2])
+        print(droplist)
+    else:
+        cursor = con.cursor()
+        var = cursor.execute("SELECT * from Weapons where ID = {0}".format(randNumber))
+        for row in var:
+            droplist = (row[0],row[1],row[2])
+        print(droplist)
+    print("Operation Successful")
+dropGen()

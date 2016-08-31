@@ -85,13 +85,29 @@ def roomGen():
     var = cursor.execute("SELECT * from RoomGen WHERE desID = {0}".format(randNumber))
     for row in var:
         roomDes = row[1]
+    
     return roomDes
 
 #def enemyStatGen():
     
 
-#def dropGen():
+def dropGen():
+    randNumber = random.randint(1,10)
+    decider = random.randint(1,2)
     
+    if decider == 1:
+        cursor = con.cursor()
+        var = cursor.execute("SELECT * from Armours where ID = {0}".format(randNumber))
+        for row in var:
+            droplist = (row[0],row[1],row[2])
+    
+    else:
+        cursor = con.cursor()
+        var = cursor.execute("SELECT * from Weapons where ID = {0}".format(randNumber))
+        for row in var:
+            droplist = (row[0],row[1],row[2])
+    
+    return droplist
 
 #def rest():
     
