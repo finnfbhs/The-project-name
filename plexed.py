@@ -11,6 +11,7 @@ def loading():
     global name
     global weapon
     global armour
+    global lifeforce
     
     print("Saves:")
     cursor = con.execute("SELECT SaveID,Name from Save")
@@ -32,6 +33,11 @@ def loading():
             name = row[0]
         print("Name = {0}".format(name))
         
+        cursor = con.execute("SELECT LifeForce from Save where SaveID = {0}".format(answer))
+        for row in cursor:
+            lifeforce = row[0]
+        print("Lifeforce = {0}".format(lifeforce))
+        
         cursor = con.execute("SELECT Weapon from Save where SaveID = {0}".format(answer))
         for row in cursor:
             weaponID = row[0]
@@ -52,14 +58,16 @@ def newSave():
     global name
     global weapon
     global armour
+    global lifeforce
     
     name = input("What is your name?")
-    details = (name,1,1)
+    details = (name,1,1,10)
 
     cursor = con.cursor()
-    cursor.execute("INSERT INTO Save(Name,Weapon,Armour) VALUES (?,?,?)",details)
+    cursor.execute("INSERT INTO Save(Name,Weapon,Armour,LifeForce) VALUES (?,?,?,?)",details)
     con.commit()
     
+    lifeforce = 10
     weapon = [1, "Scalpel", 5]
     armour = [1, "Ripped Lab Coat", 4]
     
@@ -85,7 +93,7 @@ def saving():
     armourID = armour[0]
     
     cursor = con.cursor()
-    cursor.execute("UPDATE Save SET Weapon = ?, Armour = ? WHERE SaveID= ?",(weaponID, armourID, saveID))
+    cursor.execute("UPDATE Save SET Weapon = ?, Armour = ?, LifeForce = ? WHERE SaveID= ?",(weaponID, armourID, lifeforce, saveID))
     con.commit()   
 
 def deleteSave():
@@ -100,8 +108,8 @@ def deleteSave():
     con.commit()
     print("Save {0} deleted successfully".format(ID))
 
-def final():
-    print("")
+#def final():
+    
 
 #def combat():
     
@@ -133,19 +141,66 @@ def dropGen():
         cursor = con.cursor()
         var = cursor.execute("SELECT * from Weapons where ID = {0}".format(randNumber))
         for row in var:
-            droplist = (row[0],row[1],row[2])
+            droplist = [row[0],row[1],row[2]]
     
     return droplist
 
-#def rest():
-    
+def rest():
+    global lifeforce
+    lifeforce = 10
+    print("You take a nap for a few minutes..")
+    time.sleep(5)
+    print("Lifeforce has been replenished.")
+    print("Lifeforce = {0}".format(lifeforce))
 
-#def checkStats():
+def checkStats():
+    print("Name = {0}".format(name))
+    print("Lifeforce = {0}".format(lifeforce))
+    print("Weapon = {0}, Damage = {1}".format(weapon[1],weapon[2]))
+    print("Armour = {0}, Defense = {1}".format(armour[1],armour[2]))
 
+def help():
+    print("List of commands:")
+    print(" ")
+    print("Explore")
+    print("Attack")
+    print("Rest")
+    print("Checkstats")
+    print("Save")
 
 def main():
     print("Plexed")
     time.sleep(3)
     loading()
+    var = 1
+    while var == 1:
+        roomDes = roomGen()
+        print("You come into {0}".format(roomDes))
+        answer = input("What would you like to do? (type help for a list of commands)")
+        if answer.lower == "explore":
+            print("You exit the room.")
+            time.sleep(3)
+            
+        elif answer.lower == "attack":
+            combat()
+            time.sleep(3)
+            
+        elif answer.lower == "rest":
+            rest()
+            time.sleep(3)
+            
+        elif answer.lower == "checkstats":
+            checkStats()
+            time.sleep(3)
+            
+        elif answer.lower == "save":
+            saving()
+            time.sleep(3)
+            
+        elif answer.lower == "help":
+            help()time.sleep(3)
+        
+        else:
+            print("Not a valid command; type help for a list of commands")
 
 main()
