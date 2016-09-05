@@ -8,63 +8,70 @@ import time
 con = sqlite3.connect('database.db')
 
 def loading():
-    global name
-    global weapon
-    global armour
-    global lifeforce
-    
-    print("Saves:")
-    cursor = con.execute("SELECT SaveID,Name from Save")
-    for row in cursor:
-        print(row[0],row[1])
-    answer = int(input("To create a new save enter '0', to load a save enter the save number, to delete a save enter '-1'."))
-    
-    if answer == 0:
-        newSave()
-    
-    elif answer == -1:
-        answer = input("Are you sure? (yes/no)")
-        if answer == "yes":
-            deleteSave()
-    
-    else:
-        saveID = answer
+    hold = 0
+    while hold == 0:
+        global name
+        global weapon
+        global armour
+        global lifeforce
+        global saveID
         
-        cursor = con.execute("SELECT Name from Save where SaveID = {0}".format(answer))
-        for row in cursor:
-            name = row[0]
-        print("Name = {0}".format(name))
+        print("Saves:")
         time.sleep(1)
-        
-        cursor = con.execute("SELECT LifeForce from Save where SaveID = {0}".format(answer))
+        cursor = con.execute("SELECT SaveID,Name from Save")
         for row in cursor:
-            lifeforce = row[0]
-        print("Lifeforce = {0}".format(lifeforce))
-        time.sleep(1)
+            print(row[0],row[1])
+        answer = int(input("To create a new save enter '0', to load a save enter the save number, to delete a save enter '-1'."))
         
-        cursor = con.execute("SELECT Weapon from Save where SaveID = {0}".format(answer))
-        for row in cursor:
-            weaponID = row[0]
-            weaponcur = con.execute("SELECT * from Weapons where ID = {0}".format(weaponID))
-            for row in weaponcur:
-                weapon = [row[0],row[1],row[2]]
-        print("Weapon = {0}".format(weapon[1]))
-        time.sleep(1)
+        if answer == 0:
+            hold = 1
+            newSave()
         
-        cursor = con.execute("SELECT Armour from Save where SaveID = {0}".format(answer))
-        for row in cursor:
-            armourID = row[0]
-            armourcur = con.execute("SELECT * from Armours where ID = {0}".format(armourID))
-            for row in armourcur:
-                armour = [row[0],row[1],row[2]]
-        print("Armour = {0}".format(armour[1]))
-        time.sleep(3)
+        elif answer == -1:
+            answer = input("Are you sure? (yes/no)")
+            if answer == "yes":
+                deleteSave()
+        
+        else:
+            hold = 1
+            saveID = answer
+            
+            cursor = con.execute("SELECT Name from Save where SaveID = {0}".format(answer))
+            for row in cursor:
+                name = row[0]
+            print("Name = {0}".format(name))
+            time.sleep(1)
+            
+            cursor = con.execute("SELECT LifeForce from Save where SaveID = {0}".format(answer))
+            for row in cursor:
+                lifeforce = row[0]
+            print("Lifeforce = {0}".format(lifeforce))
+            time.sleep(1)
+            
+            cursor = con.execute("SELECT Weapon from Save where SaveID = {0}".format(answer))
+            for row in cursor:
+                weaponID = row[0]
+                weaponcur = con.execute("SELECT * from Weapons where ID = {0}".format(weaponID))
+                for row in weaponcur:
+                    weapon = [row[0],row[1],row[2]]
+            print("Weapon = {0}".format(weapon[1]))
+            time.sleep(1)
+            
+            cursor = con.execute("SELECT Armour from Save where SaveID = {0}".format(answer))
+            for row in cursor:
+                armourID = row[0]
+                armourcur = con.execute("SELECT * from Armours where ID = {0}".format(armourID))
+                for row in armourcur:
+                    armour = [row[0],row[1],row[2]]
+            print("Armour = {0}".format(armour[1]))
+            time.sleep(3)
 
 def newSave():
     global name
     global weapon
     global armour
     global lifeforce
+    global saveID
     
     name = input("What is your name?")
     details = (name,1,1,10)
@@ -73,12 +80,19 @@ def newSave():
     cursor.execute("INSERT INTO Save(Name,Weapon,Armour,LifeForce) VALUES (?,?,?,?)",details)
     con.commit()
     
-    #saveID = session.query(ObjectRes).order_by(ObjectRes.id.desc()).first()
+    savelist = []
+    cursor = con.cursor()
+    saveids = cursor.execute("SELECT SaveID from Save")
+    for row in saveids:
+        saveidhold = row[0]
+        savelist.append(saveidhold)
+    saveID = max(savelist)
     
     lifeforce = 10
     weapon = [1, "Scalpel", 5]
     armour = [1, "Ripped Lab Coat", 4]
     
+    time.sleep(2)
     print("You wake up. Everything is very hazy.")
     time.sleep(3)
     print("Regaining vision you see that you're in some kind of medical room.")
@@ -102,7 +116,9 @@ def saving():
     
     cursor = con.cursor()
     cursor.execute("UPDATE Save SET Weapon = ?, Armour = ?, LifeForce = ? WHERE SaveID= ?",(weaponID, armourID, lifeforce, saveID))
-    con.commit()   
+    con.commit()
+    
+    print("Game saved successfully")
 
 def deleteSave():
     print("Saves:")

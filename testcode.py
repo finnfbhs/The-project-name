@@ -62,14 +62,25 @@ print("opened database successfully")
         #print(droplist)
     #print("Operation Successful")
     
-def delete():
-    print("Saves:")
-    cursor = con.execute("SELECT SaveID,Name from Save")
-    for row in cursor:
-        print(row[0],row[1])
-    ID = int(input("What save would you like to delete? (Enter the save number)"))
+#def delete():
+    #print("Saves:")
+    #cursor = con.execute("SELECT SaveID,Name from Save")
+    #for row in cursor:
+        #print(row[0],row[1])
+    #ID = int(input("What save would you like to delete? (Enter the save number)"))
+    #cursor = con.cursor()
+    #cursor.execute("DELETE FROM Save where SaveID = {0}".format(ID))
+    #con.commit()
+    #print("Operation Successful")
+
+def getID():
+    savelist = []
     cursor = con.cursor()
-    cursor.execute("DELETE FROM Save where SaveID = {0}".format(ID))
-    con.commit()
-    print("Operation Successful")
-delete()
+    saveids = cursor.execute("SELECT SaveID from Save")
+    for row in saveids:
+        saveidhold = row[0]
+        savelist.append(saveidhold)
+    saveID = max(savelist)
+    print(saveID)
+
+getID()
