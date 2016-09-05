@@ -73,14 +73,14 @@ print("opened database successfully")
     #con.commit()
     #print("Operation Successful")
 
-def getID():
-    savelist = []
-    cursor = con.cursor()
-    saveids = cursor.execute("SELECT SaveID from Save")
-    for row in saveids:
-        saveidhold = row[0]
-        savelist.append(saveidhold)
-    saveID = max(savelist)
-    print(saveID)
+#def getID():
+    #savelist = []
+    #cursor = con.cursor()
+    #saveids = cursor.execute("SELECT SaveID from Save")
+    #for row in saveids:
+        #saveidhold = row[0]
+        #savelist.append(saveidhold)
+    #saveID = max(savelist)
+    #print(saveID)
 
-getID()
+#getID()

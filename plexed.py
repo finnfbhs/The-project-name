@@ -108,6 +108,7 @@ def newSave():
     print("You find a Scalpel and a Ripped Lab Coat so you grab them. Maybe they could be of use.")
     time.sleep(3)
     print("You need to find a way out!")
+    print(" ")
     time.sleep(3)    
 
 def saving():
@@ -119,6 +120,7 @@ def saving():
     con.commit()
     
     print("Game saved successfully")
+    print(" ")
 
 def deleteSave():
     print("Saves:")
@@ -126,10 +128,12 @@ def deleteSave():
     for row in cursor:
         print(row[0],row[1])
     
+    print(" ")
     ID = int(input("What save would you like to delete? (Enter the save number)"))
     cursor = con.cursor()
     cursor.execute("DELETE FROM Save where SaveID = {0}".format(ID))
     con.commit()
+    print(" ")
     print("Save {0} deleted successfully".format(ID))
 
 #def final():
@@ -178,6 +182,7 @@ def rest():
     print("Lifeforce = {0}".format(lifeforce))
     time.sleep(3)
     print("You wake up and you feel someone watching you so you exit the room")
+    print(" ")
     time.sleep(4)
 
 def checkStats():
@@ -186,13 +191,15 @@ def checkStats():
     print("Weapon = {0}, Damage = {1}".format(weapon[1],weapon[2]))
     print("Armour = {0}, Defense = {1}".format(armour[1],armour[2]))
     time.sleep(3)
+    print(" ")
     print("You didn't realize but you kept walking as you were checking your statistics so you've exited your other room.")
+    print(" ")
     time.sleep(2)
 
 def help():
     print("List of commands:")
-    time.sleep(1)
     print(" ")
+    time.sleep(1)
     print("Explore")
     time.sleep(1)
     print("Attack")
@@ -207,6 +214,7 @@ def help():
     time.sleep(3)
     print("In your search for inner help you have walked into another room.")
     time.sleep(2)
+    print(" ")
 
 def main():
     print("Plexed")
@@ -216,6 +224,7 @@ def main():
     while var == 1:
         roomDes = roomGen()
         print("You come into {0}".format(roomDes))
+        print(" ")
         time.sleep(3)
         ans = input("What would you like to do? (type help for a list of commands)")
         if ans.lower() == "explore":
