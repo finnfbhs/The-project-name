@@ -28,15 +28,19 @@ def loading():
             deleteSave()
     
     else:
+        saveID = answer
+        
         cursor = con.execute("SELECT Name from Save where SaveID = {0}".format(answer))
         for row in cursor:
             name = row[0]
         print("Name = {0}".format(name))
+        time.sleep(1)
         
         cursor = con.execute("SELECT LifeForce from Save where SaveID = {0}".format(answer))
         for row in cursor:
             lifeforce = row[0]
         print("Lifeforce = {0}".format(lifeforce))
+        time.sleep(1)
         
         cursor = con.execute("SELECT Weapon from Save where SaveID = {0}".format(answer))
         for row in cursor:
@@ -45,6 +49,7 @@ def loading():
             for row in weaponcur:
                 weapon = [row[0],row[1],row[2]]
         print("Weapon = {0}".format(weapon[1]))
+        time.sleep(1)
         
         cursor = con.execute("SELECT Armour from Save where SaveID = {0}".format(answer))
         for row in cursor:
@@ -53,6 +58,7 @@ def loading():
             for row in armourcur:
                 armour = [row[0],row[1],row[2]]
         print("Armour = {0}".format(armour[1]))
+        time.sleep(3)
 
 def newSave():
     global name
@@ -66,6 +72,8 @@ def newSave():
     cursor = con.cursor()
     cursor.execute("INSERT INTO Save(Name,Weapon,Armour,LifeForce) VALUES (?,?,?,?)",details)
     con.commit()
+    
+    #saveID = session.query(ObjectRes).order_by(ObjectRes.id.desc()).first()
     
     lifeforce = 10
     weapon = [1, "Scalpel", 5]
@@ -152,21 +160,37 @@ def rest():
     time.sleep(5)
     print("Lifeforce has been replenished.")
     print("Lifeforce = {0}".format(lifeforce))
+    time.sleep(3)
+    print("You wake up and you feel someone watching you so you exit the room")
+    time.sleep(4)
 
 def checkStats():
     print("Name = {0}".format(name))
     print("Lifeforce = {0}".format(lifeforce))
     print("Weapon = {0}, Damage = {1}".format(weapon[1],weapon[2]))
     print("Armour = {0}, Defense = {1}".format(armour[1],armour[2]))
+    time.sleep(3)
+    print("You didn't realize but you kept walking as you were checking your statistics so you've exited your other room.")
+    time.sleep(2)
 
 def help():
     print("List of commands:")
+    time.sleep(1)
     print(" ")
     print("Explore")
+    time.sleep(1)
     print("Attack")
+    time.sleep(1)
     print("Rest")
+    time.sleep(1)
     print("Checkstats")
+    time.sleep(1)
     print("Save")
+    time.sleep(1)
+    print(" ")
+    time.sleep(3)
+    print("In your search for inner help you have walked into another room.")
+    time.sleep(2)
 
 def main():
     print("Plexed")
@@ -176,31 +200,34 @@ def main():
     while var == 1:
         roomDes = roomGen()
         print("You come into {0}".format(roomDes))
-        answer = input("What would you like to do? (type help for a list of commands)")
-        if answer.lower == "explore":
+        time.sleep(3)
+        ans = input("What would you like to do? (type help for a list of commands)")
+        if ans.lower() == "explore":
             print("You exit the room.")
             time.sleep(3)
             
-        elif answer.lower == "attack":
+        elif ans.lower() == "attack":
             combat()
             time.sleep(3)
             
-        elif answer.lower == "rest":
+        elif ans.lower() == "rest":
             rest()
             time.sleep(3)
             
-        elif answer.lower == "checkstats":
+        elif ans.lower() == "checkstats":
             checkStats()
             time.sleep(3)
             
-        elif answer.lower == "save":
+        elif ans.lower() == "save":
             saving()
             time.sleep(3)
             
-        elif answer.lower == "help":
-            help()time.sleep(3)
+        elif ans.lower() == "help":
+            help()
+            time.sleep(3)
         
         else:
             print("Not a valid command; type help for a list of commands")
+            time.sleep(3)
 
 main()
