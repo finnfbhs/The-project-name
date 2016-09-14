@@ -18,6 +18,14 @@ def loading():
         
         print("Saves:")
         time.sleep(1)
+        
+        saveidlist = []
+        cursor = con.cursor()
+        saverow = cursor.execute("SELECT SaveID from Save")
+        for row in saverow:
+            savehold = row[0]
+            saveidlist.append(savehold)        
+        
         cursor = con.execute("SELECT SaveID,Name from Save")
         for row in cursor:
             print(row[0],row[1])
@@ -32,7 +40,7 @@ def loading():
             if answer == "yes":
                 deleteSave()
         
-        else:
+        elif answer in saveidlist:
             hold = 1
             saveID = answer
             
@@ -65,6 +73,9 @@ def loading():
                     armour = [row[0],row[1],row[2]]
             print("Armour = {0}".format(armour[1]))
             time.sleep(3)
+        
+        else:
+            print("{0} is not a valid input, please follow the instructions.".format(answer))
 
 def newSave():
     global name
@@ -108,7 +119,6 @@ def newSave():
     print("You find a Scalpel and a Ripped Lab Coat so you grab them. Maybe they could be of use.")
     time.sleep(3)
     print("You need to find a way out!")
-    print(" ")
     time.sleep(3)    
 
 def saving():
@@ -120,7 +130,6 @@ def saving():
     con.commit()
     
     print("Game saved successfully")
-    print(" ")
 
 def deleteSave():
     print("Saves:")
@@ -143,7 +152,7 @@ def deleteSave():
     
 
 def roomGen():
-    randNumber = random.randint(1,30)
+    randNumber = random.randint(1,15)
 
     cursor = con.cursor()
     var = cursor.execute("SELECT * from RoomGen WHERE desID = {0}".format(randNumber))
@@ -182,8 +191,6 @@ def rest():
     print("Lifeforce = {0}".format(lifeforce))
     time.sleep(3)
     print("You wake up and you feel someone watching you so you exit the room")
-    print(" ")
-    time.sleep(4)
 
 def checkStats():
     print("Name = {0}".format(name))
@@ -193,8 +200,6 @@ def checkStats():
     time.sleep(3)
     print(" ")
     print("You didn't realize but you kept walking as you were checking your statistics so you've exited your other room.")
-    print(" ")
-    time.sleep(2)
 
 def help():
     print("List of commands:")
@@ -213,8 +218,6 @@ def help():
     print(" ")
     time.sleep(3)
     print("In your search for inner help you have walked into another room.")
-    time.sleep(2)
-    print(" ")
 
 def main():
     print("Plexed")
@@ -223,6 +226,7 @@ def main():
     var = 1
     while var == 1:
         roomDes = roomGen()
+        print(" ")
         print("You come into {0}".format(roomDes))
         print(" ")
         time.sleep(3)
