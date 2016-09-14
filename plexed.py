@@ -11,6 +11,7 @@ cursor = con.cursor()
 def loading():
     hold = 0
     while hold == 0:
+        global cursor
         global name
         global weapon
         global armour
@@ -18,6 +19,7 @@ def loading():
         global saveID
         
         print("Saves:")
+        print(" ")
         time.sleep(1)
         
         saveidlist = []
@@ -30,6 +32,7 @@ def loading():
         for row in curs:
             print(row[0],row[1])
         time.sleep(1)
+        print(" ")
         answer = int(input("To create a new save enter '0', to load a save enter the save number, to delete a save enter '-1'."))
         
         if answer == 0:
@@ -41,7 +44,7 @@ def loading():
             time.sleep(1)
             holdtwo = 1
             
-            while holdtwo = 1:
+            while holdtwo == 1:
                 answer = input("Are you sure? (yes/no)")
                 
                 if answer.lower() == "yes":
@@ -98,6 +101,8 @@ def loading():
             time.sleep(1)
 
 def saving():
+    global cursor
+    
     weaponID = weapon[0]
     armourID = armour[0]
     
@@ -107,6 +112,8 @@ def saving():
     print("Game saved successfully")
 
 def deleteSave():
+    global cursor
+    
     time.sleep(1)
     print("Saves:")
     curs = con.execute("SELECT SaveID,Name from Save")
@@ -130,6 +137,7 @@ def newSave():
     global armour
     global lifeforce
     global saveID
+    global cursor
     
     time.sleep(1)
     print(" ")
@@ -146,7 +154,7 @@ def newSave():
         savelist.append(saveidhold)
     saveID = max(savelist)
     
-    lifeforce = 10
+    lifeforce = 25
     weapon = [1, "Scalpel", 5]
     armour = [1, "Ripped Lab Coat", 4]
     
@@ -181,69 +189,65 @@ def combat():
     print("A {0} leaps out at you. Time to fight!".format(enemy[0]))
     print(" ")
     time.sleep(2)
-    live = 1
+    var = 1
     
-    while live == 1:
+    while var == 1:
         print("{0} Life Force = {1}       {2} Life Force = {3}".format(name, lifeforce, enemy[0], enemyLifeForce))
-        print(" ")
-        var = 1
-        
-        while var == 1:
-            time.sleep(2)
-            command = input("What are you going to do? (type help for a list of battle commands)")
+        print(" ")            
+        time.sleep(2)
+        command = input("What are you going to do? (type help for a list of battle commands)")
             
-            if command.lower() == "attack":
-                hitluck = random.randint(1,5)
+        if command.lower() == "attack":
+            hitluck = random.randint(1,5)
                 
-                if hitluck != 1:
-                    enemyLifeForce = enemyLifeForce - weapon[2]
-                    time.sleep(1)
-                    print(" ")
-                    print("Attack Hit! Enemy took {0} damage!".format(weapon[2]))
+            if hitluck != 1:
+                enemyLifeForce = enemyLifeForce - weapon[2]
+                time.sleep(1)
+                print(" ")
+                print("Attack Hit! Enemy took {0} damage!".format(weapon[2]))
+                
+                if enemyLifeForce <= 0:
+                    win(enemy)
                     var = 0
                     
-                    if enemyLifeForce <= 0:
-                        win(enemy)
-                        live = 0
-                    else:
-                        time.sleep(1)
-                        print(" ")
                 else:
                     time.sleep(1)
                     print(" ")
-                    print("Attack Missed!")
-                    var = 0
-            
-            elif command.lower() == "flee":
-                runluck = random.randint(1,5)
-                
-                if runluck == 1 or runluck == 2 or runluck == 3:
-                    time.sleep(1)
-                    print(" ")
-                    print("Got away safely!")
-                    var = 0
-                else:
-                    time.sleep(1)
-                    print(" ")
-                    print("You were chased and could not escape!")
-                    var = 0
-            
-            elif command.lower() == "help":
-                time.sleep(1)
-                print(" ")
-                print("Commands:")
-                print(" ")
-                time.sleep(1)
-                print("attack")
-                print("flee")
-                print(" ")
-                time.sleep(1)
-            
             else:
                 time.sleep(1)
                 print(" ")
-                print("Invalid command")
+                print("Attack Missed!")
         
+        elif command.lower() == "flee":
+            runluck = random.randint(1,5)
+            
+            if runluck == 1 or runluck == 2 or runluck == 3:
+                time.sleep(1)
+                print(" ")
+                print("Got away safely!")
+                var = 0
+                
+            else:
+                time.sleep(1)
+                print(" ")
+                print("You were chased and could not escape!")
+        
+        elif command.lower() == "help":
+            time.sleep(1)
+            print(" ")
+            print("Commands:")
+            print(" ")
+            time.sleep(1)
+            print("attack")
+            print("flee")
+            print(" ")
+            time.sleep(1)
+        
+        else:
+            time.sleep(1)
+            print(" ")
+            print("Invalid command")
+    
         if live != 0:
             enemyluck = random.randint(1,4)
             
@@ -255,16 +259,19 @@ def combat():
                 
                 if lifeforce <= 0:
                     death()
-                    live = 0
+                    var = 0
                 else:
                     print(" ")
-            
             else:
-                time.sleep(1)
-                print(" ")
                 print("Enemy attack missed!")
+            
+        else:
+            time.sleep(1)
+            print(" ")
 
 def death():
+    global cursor
+    
     time.sleep(2)
     print(" ")
     print("You have lost too much blood, your life force has been depleted!")
@@ -278,7 +285,7 @@ def death():
     print(" ")
     print("Your vision fades...")
     
-    lifeforce = 10
+    lifeforce = 25
     weapon = [1, "Scalpel", 5]
     armour = [1, "Ripped Lab Coat", 4]
     
@@ -317,6 +324,7 @@ def win(enemy):
     enemyName = enemy[0]
     global weapon
     global armour
+    global cursor
     
     prize = dropGen()
     drop = prize[0]
@@ -385,20 +393,24 @@ def win(enemy):
                 print("Invalid command. Enter yes or no.")
 
 def enemyStatGen():
+    global cursor
+    
     randEnemy = random.randint(1,5)
     
     vari = cursor.execute("SELECT * from EnemyGen WHERE desID = {0}".format(randEnemy))
     for row in vari:
         enemyDes = row[1]
     
-    enemyLifeForce = random.randint(1,10)
-    enemyDamage = random.randint(1,3)
+    enemyLifeForce = random.randint(10,40)
+    enemyDamage = random.randint(3,10)
     
     enemy = (enemyDes, enemyLifeForce, enemyDamage)
     
     return enemy
 
 def dropGen():
+    global cursor
+    
     randNumber = random.randint(1,10)
     decider = random.randint(1,2)
     
@@ -426,7 +438,7 @@ def roomGen():
 
 def rest():
     global lifeforce
-    lifeforce = 10
+    lifeforce = 25
     time.sleep(1)
     print(" ")
     print("You take a nap for a few minutes..")
@@ -465,7 +477,6 @@ def help():
     print(" ")
     time.sleep(3)
     print("In your search for inner help you have walked into another room.")
-    print(" ")
 
 #def final():
 
