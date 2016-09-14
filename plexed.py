@@ -29,6 +29,7 @@ def loading():
         cursor = con.execute("SELECT SaveID,Name from Save")
         for row in cursor:
             print(row[0],row[1])
+        time.sleep(1)
         answer = int(input("To create a new save enter '0', to load a save enter the save number, to delete a save enter '-1'."))
         
         if answer == 0:
@@ -36,9 +37,20 @@ def loading():
             newSave()
         
         elif answer == -1:
-            answer = input("Are you sure? (yes/no)")
-            if answer == "yes":
-                deleteSave()
+            print(" ")
+            time.sleep(1)
+            holdtwo = 1
+            while holdtwo = 1:
+                answer = input("Are you sure? (yes/no)")
+                if answer.lower() == "yes":
+                    deleteSave()
+                    holdtwo = 0
+                elif answer.lower() == "no":
+                    print(" ")
+                    holdtwo = 0
+                else:
+                    print(" ")
+                    print("Invalid command. Enter yes or no.")
         
         elif answer in saveidlist:
             hold = 1
@@ -75,7 +87,32 @@ def loading():
             time.sleep(3)
         
         else:
+            print(" ")
             print("{0} is not a valid input, please follow the instructions.".format(answer))
+
+def saving():
+    weaponID = weapon[0]
+    armourID = armour[0]
+    
+    cursor = con.cursor()
+    cursor.execute("UPDATE Save SET Weapon = ?, Armour = ?, LifeForce = ? WHERE SaveID= ?",(weaponID, armourID, lifeforce, saveID))
+    con.commit()
+    
+    print("Game saved successfully")
+
+def deleteSave():
+    print("Saves:")
+    cursor = con.execute("SELECT SaveID,Name from Save")
+    for row in cursor:
+        print(row[0],row[1])
+    
+    print(" ")
+    ID = int(input("What save would you like to delete? (Enter the save number)"))
+    cursor = con.cursor()
+    cursor.execute("DELETE FROM Save where SaveID = {0}".format(ID))
+    con.commit()
+    print(" ")
+    print("Save {0} deleted successfully".format(ID))
 
 def newSave():
     global name
@@ -119,50 +156,154 @@ def newSave():
     print("You find a Scalpel and a Ripped Lab Coat so you grab them. Maybe they could be of use.")
     time.sleep(3)
     print("You need to find a way out!")
-    time.sleep(3)    
+    time.sleep(3)        
 
-def saving():
-    weaponID = weapon[0]
-    armourID = armour[0]
+def combat():
+    global lifeforce
     
-    cursor = con.cursor()
-    cursor.execute("UPDATE Save SET Weapon = ?, Armour = ?, LifeForce = ? WHERE SaveID= ?",(weaponID, armourID, lifeforce, saveID))
-    con.commit()
-    
-    print("Game saved successfully")
-
-def deleteSave():
-    print("Saves:")
-    cursor = con.execute("SELECT SaveID,Name from Save")
-    for row in cursor:
-        print(row[0],row[1])
-    
+    enemy = enemyStatGen()
+    enemyLifeForce = enemy[1]
+    enemyDamage = enemy[2]
     print(" ")
-    ID = int(input("What save would you like to delete? (Enter the save number)"))
-    cursor = con.cursor()
-    cursor.execute("DELETE FROM Save where SaveID = {0}".format(ID))
-    con.commit()
+    print("A {0} leaps out at you. Time to fight!".format(enemy[0]))
     print(" ")
-    print("Save {0} deleted successfully".format(ID))
+    live = 1
+    while live == 1:
+        print("{0} Life Force = {1}       {2} Life Force = {3}".format(name, lifeforce, enemy[0], enemyLifeForce))
+        var = 1
+        while var == 1:
+            command = input("What are you going to do? (type help for a list of battle commands)")
+            if command.lower() == "attack":
+                hitluck = random.randint(1,5)
+                if hitluck != 1:
+                    enemyLifeForce = enemyLifeForce - weapon[2]
+                    print("Attack Hit! Enemy took {0} damage!".format(weapon[2]))
+                    var = 0
+                    if enemyLifeForce <= 0:
+                        win(enemy)
+                        live = 0
+                    else:
+                        print(" ")
+                else:
+                    print("Attack Missed!")
+                    var = 0
+            elif command.lower() == "flee":
+                runluck = random.randint(1,5)
+                if runluck == 1 or runluck == 2 or runluck == 3:
+                    print("Got away safely!")
+                    var = 0
+                else:
+                    print("You were chased and could not escape!")
+                    var = 0
+            else:
+                print("Invalid command")
+        if live != 0:
+            enemyluck = random.randint(1,4)
+            if enemyluck != 1:
+                lifeforce = lifeforce - enemyDamage
+                print("You have been hit! You took {0} damage.".format(enemyDamage))
+                if lifeforce <= 0:
+                    death()
+                    live = 0
+                else:
+                    print(" ")
+            else:
+                print("Enemy attack missed!")
 
-#def final():
+def death():
+    print("You have lost too much blood, your life force has been depleted!")
+    time.sleep(1)
+    print("You are losing vision")
+    time.sleep(1)
+    print("You fall to the floor and see a figure walk towards you.")
+    time.sleep(1)
+    print("Your vision fades...")
     
-
-#def combat():
+    lifeforce = 10
+    weapon = [1, "Scalpel", 5]
+    armour = [1, "Ripped Lab Coat", 4]
     
-
-def roomGen():
-    randNumber = random.randint(1,15)
-
     cursor = con.cursor()
-    var = cursor.execute("SELECT * from RoomGen WHERE desID = {0}".format(randNumber))
-    for row in var:
-        roomDes = row[1]
+    cursor.execute("UPDATE Save SET Weapon = 1, Armour = 1, LifeForce = 10 WHERE SaveID= ?",(saveID))
     
-    return roomDes
+    time.sleep(2)
+    print("You wake up. Everything is very hazy.")
+    time.sleep(3)
+    print("Regaining vision you see that you're in some kind of medical room.")
+    time.sleep(3)
+    print("You see an empty syringe on the ground next to you labelled HALLUCINOGENS")
+    time.sleep(3)
+    print("Looking at your arm you see needle holes. You've been given hallucinogens!")
+    time.sleep(3)
+    print("These may affect the world around you. Rooms you have just came out of may have changed.")
+    time.sleep(3)
+    print("Things are hard to see and nothing makes sense.")
+    time.sleep(3)
+    print("You lost your weapons and armour!")
+    time.sleep(3)
+    print("You find a Scalpel and a Ripped Lab Coat so you grab them. Maybe they could be of use.")
+    time.sleep(3)
+    print("You need to find a way out!")
+    time.sleep(3)      
 
-#def enemyStatGen():
+def win(enemy):
+    enemyName = enemy[0]
+    global weapon
+    global armour
     
+    prize = dropGen()
+    drop = prize[0]
+    decider = prize[1]
+    
+    print("You killed the {0}!".format(enemyName))
+    print("They dropped a {0}".format(drop[1]))
+    if decider == 1:
+        var = 1
+        while var == 1:
+            answer = input("Would you like to replace your {0}: Defense = {1} with the {2}: Defense = {3}? (yes/no)".format(armour[1], armour[2], drop[1], drop[2]))
+            if answer.lower() == "yes":
+                armour = [drop[0], drop[1], drop[2]]
+                cursor = con.cursor()
+                cursor.execute("UPDATE Save SET Armour = ? WHERE SaveID= ?",(drop[0], saveID))
+                con.commit()
+                print("You throw away your old armour and replaced with a new one! Armour updated")
+                var = 0
+            elif answer.lower() == "no":
+                print("You decide to keep your current armour.")
+                var = 0
+            else:
+                print("Invalid command. Enter yes or no.")
+    else:
+        var = 1
+        while var == 1:
+            answer = input("Would you like to replace your {0}: Damage = {1} with the {2}: Damage = {3}? (yes/no)".format(weapon[1], weapon[2], drop[1], drop[2]))
+            if answer.lower() == "yes":
+                weapon = [drop[0], drop[1], drop[2]]
+                cursor = con.cursor()
+                cursor.execute("UPDATE Save SET Weapon = ? WHERE SaveID= ?",(drop[0], saveID))
+                con.commit()
+                print("You throw away your old weapon and replaced with a new one! Weapon updated")
+                var = 0
+            elif answer.lower() == "no":
+                print("You decide to keep your current weapon.")
+                var = 0
+            else:
+                print("Invalid command. Enter yes or no.")
+
+def enemyStatGen():
+    randEnemy = random.randint(1,5)
+    
+    cursor = con.cursor()
+    vari = cursor.execute("SELECT * from EnemyGen WHERE desID = {0}".format(randEnemy))
+    for row in vari:
+        enemyDes = row[1]
+    
+    enemyLifeForce = random.randint(1,10)
+    enemyDamage = random.randint(1,3)
+    
+    enemy = (enemyDes, enemyLifeForce, enemyDamage)
+    
+    return enemy
 
 def dropGen():
     randNumber = random.randint(1,10)
@@ -180,7 +321,18 @@ def dropGen():
         for row in var:
             droplist = [row[0],row[1],row[2]]
     
-    return droplist
+    parcel = (droplist, decider)
+    return parcel
+
+def roomGen():
+    randNumber = random.randint(1,15)
+
+    cursor = con.cursor()
+    var = cursor.execute("SELECT * from RoomGen WHERE desID = {0}".format(randNumber))
+    for row in var:
+        roomDes = row[1]
+    
+    return roomDes
 
 def rest():
     global lifeforce
@@ -219,12 +371,15 @@ def help():
     time.sleep(3)
     print("In your search for inner help you have walked into another room.")
 
+#def final():
+
 def main():
     print("Plexed")
+    print(" ")
     time.sleep(3)
     loading()
-    var = 1
-    while var == 1:
+    variable = 1
+    while variable == 1:
         roomDes = roomGen()
         print(" ")
         print("You come into {0}".format(roomDes))
