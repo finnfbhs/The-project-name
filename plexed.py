@@ -380,190 +380,193 @@ def win(enemy):         #win function. Occurs when player wins combat
             
             if answer.lower() == "yes":         #If answer is equal to yes then:
                 armour = [drop[0], drop[1], drop[2]]            #Set armour to new values
-                cursor.execute("UPDATE Save SET Armour = ? WHERE SaveID= ?",(drop[0], saveID))          #Update Save table in database where SaveID = saveID value
+                cursor.execute("UPDATE Save SET Armour = ? WHERE SaveID= ?",(drop[0], saveID))          #Updates armour in Save table in database where SaveID = saveID value
                 time.sleep(1)           #hold 1 second
                 print(" ")          #Output spacer line
                 print("You throw away your old armour and replaced with a new one! Armour updated")         #Outputs successful armour swap statement
                 var = 0         #Set var to 0 to end loop
             
-            elif answer.lower() == "no":
-                time.sleep(1)
-                print(" ")
-                print("You decide to keep your current armour.")
-                var = 0
+            elif answer.lower() == "no":            #Else if answer is equal to no then:
+                time.sleep(1)           #hold 1 second
+                print(" ")          #Outputs spacer line
+                print("You decide to keep your current armour.")            #Outputs keep armour statement
+                var = 0         #Sets var to 0 to end loop
             
-            else:
-                time.sleep(1)
-                print(" ")
-                print("Invalid command. Enter yes or no.")
+            else:           #Else so answer is not equal to yes or no:
+                time.sleep(1)           #hold 1 second
+                print(" ")          #Outputs spacer line
+                print("Invalid command. Enter yes or no.")          #Outputs error message
     
-    else:
-        var = 1
+    else:           #Else so item dropped is a weapon
+        var = 1         #Sets var to 1 for loop
         
-        while var == 1:
-            time.sleep(1)
-            print(" ")
-            answer = input("Would you like to replace your {0}: Damage = {1} with the {2}: Damage = {3}? (yes/no)".format(weapon[1], weapon[2], drop[1], drop[2]))
+        while var == 1:         #Loop statement
+            time.sleep(1)           #hold 1 second
+            print(" ")          #Outputs spacer line
+            answer = input("Would you like to replace your {0}: Damage = {1} with the {2}: Damage = {3}? (yes/no)".format(weapon[1], weapon[2], drop[1], drop[2]))          #Set answer to input, asks player if they would like to replace their currently equipped weapon with the dropped piece
             
-            if answer.lower() == "yes":
-                weapon = [drop[0], drop[1], drop[2]]
-                cursor.execute("UPDATE Save SET Weapon = ? WHERE SaveID= ?",(drop[0], saveID))
-                time.sleep(1)
-                print(" ")
-                print("You throw away your old weapon and replaced with a new one! Weapon updated")
-                var = 0
+            if answer.lower() == "yes":         #If answer is equal to yes then:
+                weapon = [drop[0], drop[1], drop[2]]            #Sets weapon to new values
+                cursor.execute("UPDATE Save SET Weapon = ? WHERE SaveID= ?",(drop[0], saveID))          #Updates weapon in Save table in database where SaveID = saveID value
+                time.sleep(1)           #hold 1 second
+                print(" ")          #Output spacer line
+                print("You throw away your old weapon and replaced with a new one! Weapon updated")         #Outputs successful weapon swap statement
+                var = 0         #Sets var to 0 to end loop
             
-            elif answer.lower() == "no":
-                time.sleep(1)
-                print(" ")
-                print("You decide to keep your current weapon.")
-                var = 0
+            elif answer.lower() == "no":            #Else if answer is equal to no then:
+                time.sleep(1)           #hold 1 second
+                print(" ")          #Outputs spacer line
+                print("You decide to keep your current weapon.")            #Outputs keep weapon statement
+                var = 0         #Sets var to 0 to end loop
             
-            else:
-                time.sleep(1)
-                print(" ")
-                print("Invalid command. Enter yes or no.")
+            else:           #Else so answer is not equal to yes or no:
+                time.sleep(1)           #hold 1 second
+                print(" ")          #Outputs spacer line
+                print("Invalid command. Enter yes or no.")          #Outputs error message
 
-def enemyStatGen():
-    global cursor
+def enemyStatGen():         #enemyStatGen function is called in combat function. Its purpose is to generate a description, lifeforce and damage value for the enemy for combat
+    global cursor           #Declares global variable
     
-    randEnemy = random.randint(1,5)
+    randEnemy = random.randint(1,5)         #Set randEnemy to a random integer between 1 and 5
     
-    vari = cursor.execute("SELECT * from EnemyGen WHERE desID = {0}".format(randEnemy))
-    for row in vari:
-        enemyDes = row[1]
+    vari = cursor.execute("SELECT * from EnemyGen WHERE desID = {0}".format(randEnemy))         #Set vari to pulled data from EnemyGen table in database where desID is equal to randEnemy value
+    for row in vari:            #For every row in pulled data:
+        enemyDes = row[1]           #Set enemyDes to value of pulled data at position 1
     
-    enemyLifeForce = random.randint(10,40)
-    enemyDamage = random.randint(3,10)
+    enemyLifeForce = random.randint(10,40)          #Sets enemyLifeForce to a random integer between 10 and 40
+    enemyDamage = random.randint(3,8)          #Sets enemyDamage to a random integer between 3 and 8
     
-    enemy = (enemyDes, enemyLifeForce, enemyDamage)
+    enemy = (enemyDes, enemyLifeForce, enemyDamage)         #Sets enemy to a list containing enemyDes, enemyLifeForce and enemyDamage. This is essentially a parcel for returning values easily
     
-    return enemy
+    return enemy            #Returns the enemy list back to the combat function
 
-def dropGen():
-    global cursor
+def dropGen():          #dropGen function is called in the win function. Its purpose is to randomly pull a weapon or armour from the database and return it to the win function to be given to the player
+    global cursor           #Declares global variable
     
-    randNumber = random.randint(1,10)
-    decider = random.randint(1,2)
+    randNumber = random.randint(1,10)           #Set randNumber to a random integer between 1 and 10
+    decider = random.randint(1,2)           #Set decider to a random integer either 1 or 2
     
-    if decider == 1:
-        var = cursor.execute("SELECT * from Armours where ID = {0}".format(randNumber))
-        for row in var:
-            droplist = (row[0],row[1],row[2])
+    if decider == 1:            #If decider equals 1 then:
+        var = cursor.execute("SELECT * from Armours where ID = {0}".format(randNumber))         #Set var to data in Armours table in database where ID equals randNumber
+        for row in var:         #For every row of data in var:
+            droplist = (row[0],row[1],row[2])           #Set droplist list to pulled data values
     
-    else:
-        var = cursor.execute("SELECT * from Weapons where ID = {0}".format(randNumber))
-        for row in var:
-            droplist = [row[0],row[1],row[2]]
+    else:           #If decider equals 2 then:
+        var = cursor.execute("SELECT * from Weapons where ID = {0}".format(randNumber))         #Set var to data in Weapons table in database where ID equals randNumber
+        for row in var:         #For every row of data in var:
+            droplist = [row[0],row[1],row[2]]           #Set droplist list to pulled data values
     
-    parcel = (droplist, decider)
-    return parcel
+    parcel = (droplist, decider)            #Set parcel list to droplist and decider values. This is to easily return both sets of data into the win function
+    return parcel           #Send parcel list to win function
 
-def roomGen():
-    randNumber = random.randint(1,15)
+def roomGen():          #roomGen function. Its purpose is to generate a room description and return it to the main function
+    randNumber = random.randint(1,15)           #Set randNumber to a random integer between 1 and 15
 
-    var = cursor.execute("SELECT * from RoomGen WHERE desID = {0}".format(randNumber))
-    for row in var:
-        roomDes = row[1]
+    var = cursor.execute("SELECT * from RoomGen WHERE desID = {0}".format(randNumber))          #Set var to data in RoomGen table in database where desID equals randNumber
+    for row in var:         #For every row of data in var:
+        roomDes = row[1]            #Set roomDes to data in position 1 of row
     
-    return roomDes
+    return roomDes          #Return roomDes value to main function
 
-def rest():
-    global lifeforce
-    lifeforce = 30
-    time.sleep(1)
-    print(" ")
-    print("You take a nap for a few minutes..")
-    time.sleep(5)
-    print(" ")
-    print("Lifeforce has been replenished.")
-    print(" ")
-    print("Lifeforce = {0}".format(lifeforce))
-    time.sleep(3)
-    print(" ")
-    print("You wake up and you feel someone watching you so you exit the room")
-
-def checkStats():
-    print("Name = {0}".format(name))
-    print("Lifeforce = {0}".format(lifeforce))
-    print("Weapon = {0}, Damage = {1}".format(weapon[1],weapon[2]))
-    print("Armour = {0}, Defense = {1}".format(armour[1],armour[2]))
-    time.sleep(3)
-    print(" ")
-    print("You didn't realize but you kept walking as you were checking your statistics so you've exited your other room.")
-
-def help():
-    print("List of commands:")
-    print(" ")
-    time.sleep(1)
-    print("Explore")
-    time.sleep(1)
-    print("Attack")
-    time.sleep(1)
-    print("Rest")
-    time.sleep(1)
-    print("Checkstats")
-    time.sleep(1)
-    print("Save")
-    time.sleep(1)
-    print(" ")
-    time.sleep(3)
-    print("In your search for inner help you have walked into another room.")
-
-def main():
-    print("Plexed")
-    print(" ")
-    time.sleep(3)
-    loading()
-    variable = 1
+def rest():         #rest function. Its purpose is to set players life force back to full
+    global lifeforce            #Declares global variable
     
-    while variable == 1:
-        roomDes = roomGen()
-        print(" ")
-        print("You come into {0}".format(roomDes))
-        print(" ")
-        time.sleep(3)
-        ans = input("What would you like to do? (type help for a list of commands)")
-        if ans.lower() == "explore":
-            print(" ")
-            print("You exit the room.")
-            print(" ")
-            time.sleep(3)
+    lifeforce = 30          #Sets lifeforce to 30
+    
+    time.sleep(1)           #hold 1 second
+    print(" ")          #Outputs spacer line
+    print("You take a nap for a few minutes..")         #Outputs nap message
+    time.sleep(4)           #hold 4 seconds
+    print(" ")          #Outputs spacer line
+    print("Lifeforce has been replenished.")            #Outputs successful rest message
+    print(" ")          #Outputs spacer line
+    time.sleep(1)           #hold 1 second
+    print("Lifeforce = {0}".format(lifeforce))          #Outputs lifeforce value
+    time.sleep(3)           #hold 3 seconds
+    print(" ")          #Outputs spacer line
+    print("You wake up and you feel someone watching you so you exit the room")         #Outputs message
+
+def checkStats():           #checkStats function. Its purpose is to display the players weapon and armour values and their life force level
+    print("Name = {0}".format(name))            #Outputs player name
+    print("Lifeforce = {0}".format(lifeforce))          #Outputs lifeforce value
+    print("Weapon = {0}, Damage = {1}".format(weapon[1],weapon[2]))         #Outputs weapon name and damage value
+    print("Armour = {0}, Defense = {1}".format(armour[1],armour[2]))            #Outputs armour name and defense value
+    time.sleep(3)           #hold 3 seconds
+    print(" ")          #Outputs spacer line
+    print("You didn't realize but you kept walking as you were checking your statistics so you've exited your other room.")         #Outputs message
+
+def help():         #help function. Its purpose is to display the possible commands for the player in the main function
+    print("List of commands:")          #Outputs List of commands:
+    print(" ")          #Outputs spacer line
+    time.sleep(1)           #hold 1 second
+    print("Explore")            #Outputs possible command
+    time.sleep(1)           #hold 1 second
+    print("Attack")         #Outputs possible command
+    time.sleep(1)           #hold 1 second
+    print("Rest")           #Outputs possible command
+    time.sleep(1)           #hold 1 second
+    print("Checkstats")         #Outputs possible command
+    time.sleep(1)           #hold 1 second
+    print("Save")           #Outputs possible command
+    time.sleep(1)           #hold 1 second
+    print(" ")          #Outputs spacer line
+    time.sleep(3)           #hold 3 seconds
+    print("In your search for inner help you have walked into another room.")           #Outputs message
+
+def main():         #main function. Its purpose is to run through the main part of the gameplay. Many other functions are called from this function
+    print("Plexed")         #Outputs Plexed
+    print(" ")          #Outputs spacer line
+    time.sleep(3)           #hold 3 seconds
+    loading()           #Runs loading function
+    variable = 1            #Sets variable to 1 for loop
+    
+    while variable == 1:            #While loop
+        roomDes = roomGen()         #Set roomDes from returned value from roomGen function
+        print(" ")          #Outputs spacer line
+        print("You come into {0}".format(roomDes))          #Outputs current setting
+        print(" ")          #Outputs spacer line
+        time.sleep(3)           #hold 3 seconds
+        ans = input("What would you like to do? (type help for a list of commands)")            #Set ans to input, asks player what command they would like to carry out
+        if ans.lower() == "explore":            #If ans is equal to explore:
+            print(" ")          #Outputs spacer line
+            print("You exit the room.")         #Outputs successful explore message
+            print(" ")          #Outputs spacer line
+            time.sleep(3)           #hold 3 seconds
             
-        elif ans.lower() == "attack":
-            print(" ")
-            combat()
-            print(" ")
-            time.sleep(3)
+        elif ans.lower() == "attack":           #Else if ans is equal to attack:
+            print(" ")          #Outputs spacer line
+            combat()            #Runs combat function
+            print(" ")          #Outputs spacer line
+            time.sleep(3)           #hold 3 seconds
             
-        elif ans.lower() == "rest":
-            print(" ")
-            rest()
-            print(" ")
-            time.sleep(3)
+        elif ans.lower() == "rest":         #Else if ans is equal to rest:
+            print(" ")          #Outputs spacer line
+            rest()          #Runs rest function
+            print(" ")          #Outputs spacer line
+            time.sleep(3)           #hold 3 seconds
             
         elif ans.lower() == "checkstats":
-            print(" ")
-            checkStats()
-            print(" ")
-            time.sleep(3)
+            print(" ")          #Outputs spacer line
+            checkStats()            #Runs checkStats function
+            print(" ")          #Outputs spacer line
+            time.sleep(3)           #hold 3 seconds
             
         elif ans.lower() == "save":
-            print(" ")
-            saving()
-            print(" ")
-            time.sleep(3)
+            print(" ")          #Outputs spacer line
+            saving()            #Runs saving function
+            print(" ")          #Outputs spacer line
+            time.sleep(3)           #hold 3 seconds
             
         elif ans.lower() == "help":
-            print(" ")
-            help()
-            print(" ")
-            time.sleep(3)
+            print(" ")          #Outputs spacer line
+            help()          #Runs help function
+            print(" ")          #Outputs spacer line
+            time.sleep(3)           #hold 3 seconds
         
         else:
-            print(" ")
-            print("Not a valid command; type help for a list of commands")
-            print(" ")
-            time.sleep(3)
+            print(" ")          #Outputs spacer line
+            print("Not a valid command; type help for a list of commands")          #Outputs error message
+            print(" ")          #Outputs spacer line
+            time.sleep(3)           #hold 3 seconds
 
-main()
+main()          #Runs main function
