@@ -5,10 +5,11 @@
 import sqlite3          #Imports sqlite3 for connecting to the database
 import random           #Imports random for the Gen functions
 import time         #Imports time module for sleeps
+import math         #Imports math module for combat function
 con = sqlite3.connect('database.db')            #Adds a connect to database variable
 cursor = con.cursor()           #Adds a cursor database variable
 
-def loading():          #Loading function for loading saves
+def loading():          #Loading function for loading user data, creating a new save or deleting saved data in the database
     hold = 0            #Variable for looping
     while hold == 0:            #Looping while statement
         global cursor           #Declares global variable
@@ -18,6 +19,7 @@ def loading():          #Loading function for loading saves
         global lifeforce        #Declares global variable
         global saveID           #Declares global variable
         
+        print(" ")          #Outputs spacer line
         print("Saves:")         #Outputs Saves:
         print(" ")          #Outputs a spacer line
         time.sleep(1)           #hold 1 second
@@ -30,77 +32,92 @@ def loading():          #Loading function for loading saves
         
         curs = con.execute("SELECT SaveID,Name from Save")          #Pulls saveID and Name from Save table in database
         for row in curs:
-            print(row[0],row[1])        #Outputs list of name and save id
+            print("{0}. {1}".format(row[0],row[1]))        #Outputs list of name and save id
         time.sleep(1)           #hold 1 second
         print(" ")          #Outputs a spacer line
-        answer = int(input("To create a new save enter '0', to load a save enter the save number, to delete a save enter '-1'."))           #Asks for input
-        
-        if answer == 0:         #If input was 0 then:
-            hold = 1            #Set hold variable to 1 so loop ends
-            newSave()           #Runs newSave function
-        
-        elif answer == -1:          #Else if input was -1 then:
-            print(" ")          #Outputs spacer line
-            time.sleep(1)           #hold 1 second
-            holdtwo = 1         #Set holdtwo variable to 1 so loop starts
+        answer = input("To create a new save enter '0', to load a save enter the save number, to delete a save enter '-1'.")           #Asks for input
+        try:
+            answerint = int(answer)
             
-            while holdtwo == 1:         #Loop
-                answer = input("Are you sure? (yes/no)")            #Asks for input
+            if answerint == 0:         #If input was 0 then:
+                hold = 1            #Set hold variable to 1 so loop ends
+                newSave()           #Runs newSave function
+            
+            elif answerint == -1:          #Else if input was -1 then:
+                print(" ")          #Outputs spacer line
+                time.sleep(1)           #hold 1 second
+                holdtwo = 1         #Set holdtwo variable to 1 so loop starts
                 
-                if answer.lower() == "yes":         #If input was yes then:
-                    deleteSave()            #Runs deleteSave function
-                    holdtwo = 0         #Sets holdtwo variable to 0 to end loop
+                while holdtwo == 1:         #Loop
+                    answer = input("Are you sure? (yes/no)")            #Asks for input
                     
-                elif answer.lower() == "no":            #Else if input was no then:
-                    print(" ")          #Outputs spacer line
-                    holdtwo = 0         #Sets variable to 0 to end loop
+                    if answer.lower() == "yes":         #If input was yes then:
+                        print(" ")          #Outputs spacer line
+                        deleteSave()            #Runs deleteSave function
+                        holdtwo = 0         #Sets holdtwo variable to 0 to end loop
+                        
+                    elif answer.lower() == "no":            #Else if input was no then:
+                        print(" ")          #Outputs spacer line
+                        holdtwo = 0         #Sets variable to 0 to end loop
+                        
+                    else:           #Else input was else then:
+                        print(" ")          #Outputs spacer line
+                        print("Invalid command. Enter yes or no.")          #Outputs error message
+                        time.sleep(1)           #hold 1 second
                     
-                else:           #Else input was else then:
-                    print(" ")          #Outputs spacer line
-                    print("Invalid command. Enter yes or no.")          #Outputs error message
+            elif answerint in saveidlist:          #Else if input is in saveidlist list then:
+                hold = 1            #Sets variable to 1 to end loop
+                saveID = answer         #Sets saveID global variable to input
+                print(" ")          #Outputs spacer line
+                
+                #Loading name from database
+                cursor = con.execute("SELECT Name from Save where SaveID = {0}".format(answer))         #Pulls name from Save table in database where saveID is input
+                for row in cursor:
+                    name = row[0]           #Set name global variable to pulled data
+                    print("Name = {0}".format(name))            #Outputs name variable statement
                     time.sleep(1)           #hold 1 second
-        
-        elif answer in saveidlist:          #Else if input is in saveidlist list then:
-            hold = 1            #Sets variable to 1 to end loop
-            saveID = answer         #Sets saveID global variable to input
-            
-            cursor = con.execute("SELECT Name from Save where SaveID = {0}".format(answer))         #Pulls name from Save table in database where saveID is input
-            for row in cursor:
-                name = row[0]           #Set name global variable to pulled data
-            print("Name = {0}".format(name))            #Outputs name variable statement
-            time.sleep(1)           #hold 1 second
-            
-            curs = con.execute("SELECT LifeForce from Save where SaveID = {0}".format(answer))          #Pulls LifeForce from Save table in database where saveID is input
-            for row in curs:
-                lifeforce = row[0]          #Set lifeforce global variable to pulled data
-            print("Lifeforce = {0}".format(lifeforce))          #Outputs lifeforce variable statement
-            time.sleep(1)           #hold 1 second
-            
-            curs = con.execute("SELECT Weapon from Save where SaveID = {0}".format(answer))         #Pulls Weapon from Save table in database where saveID is input
-            for row in curs:
-                weaponID = row[0]           #Sets weaponID to pulled data
+                
+                #Loading lifeforce from database 
+                curs = con.execute("SELECT LifeForce from Save where SaveID = {0}".format(answer))          #Pulls LifeForce from Save table in database where saveID is input
+                for row in curs:
+                    lifeforce = row[0]          #Set lifeforce global variable to pulled data
+                    print("Lifeforce = {0}".format(lifeforce))          #Outputs lifeforce variable statement
+                    time.sleep(1)           #hold 1 second
+                
+                #Loading weapon from database      
+                curs = con.execute("SELECT Weapon from Save where SaveID = {0}".format(answer))         #Pulls Weapon from Save table in database where saveID is input
+                for row in curs:
+                    weaponID = row[0]           #Sets weaponID to pulled data
                 weaponcur = con.execute("SELECT * from Weapons where ID = {0}".format(weaponID))            #Pulls all data from Weapons table in database where weaponID is weaponID variable
                 for row in weaponcur:
                     weapon = [row[0],row[1],row[2]]         #Sets weapon global list to pulled data
-            print("Weapon = {0}".format(weapon[1]))         #Outputs weapon variable statement
-            time.sleep(1)           #hold 1 second
-            
-            curs = con.execute("SELECT Armour from Save where SaveID = {0}".format(answer))         #Pulls Armour from Save table in database where saveID is input
-            for row in curs:
-                armourID = row[0]           #Sets armourID to pulled data
+                    print("Weapon = {0}".format(weapon[1]))         #Outputs weapon variable statement
+                    time.sleep(1)           #hold 1 second
+                
+                #Loading armour from database
+                curs = con.execute("SELECT Armour from Save where SaveID = {0}".format(answer))         #Pulls Armour from Save table in database where saveID is input
+                for row in curs:
+                    armourID = row[0]           #Sets armourID to pulled data
                 armourcur = con.execute("SELECT * from Armours where ID = {0}".format(armourID))            #Pulls all data from Armours table in database where ID is armourID variable
                 for row in armourcur:
                     armour = [row[0],row[1],row[2]]         #Sets armour global list to pulled data
-            print("Armour = {0}".format(armour[1]))         #Outputs armour variable statement
-            time.sleep(3)           #hold 3 seconds
-        
-        else:           #Else if input was else then:
+                    print("Armour = {0}".format(armour[1]))         #Outputs armour variable statement
+                    time.sleep(3)           #hold 3 seconds
+                    
+            else:           #Else if input was else then:
+                time.sleep(1)           #hold 1 second
+                print(" ")          #Outputs spacer line
+                print("{0} is not a valid input, please follow the instructions.".format(answer))           #Print error message displaying incorrect input
+                time.sleep(1)           #hold 1 second
+                
+        except ValueError:          #If input was not an integer
             time.sleep(1)           #hold 1 second
             print(" ")          #Outputs spacer line
-            print("{0} is not a valid input, please follow the instructions.".format(answer))           #Print error message displaying incorrect input
+            print("Please enter an integer")            #Outputs error message
+            print(" ")          #Outputs spacer line
             time.sleep(1)           #hold 1 second
 
-def saving():           #Saving function for saving
+def saving():           #Saving function for saving the users data to the database
     global cursor           #Declares global variable
     
     weaponID = weapon[0]            #Sets weaponID to data at position 0 in weapon list
@@ -185,6 +202,7 @@ def combat():           #combat function where the combat gameplay takes place
     enemy = enemyStatGen()          #Sets enemy list to returned values of enemyStatGen function
     enemyLifeForce = enemy[1]           #enemyLifeForce is set to the data value at position 1 in enemy list
     enemyDamage = enemy[2]          #enemyDamage is set to the data value at position 2 in enemy list
+    defenseTotal = armour[2] + lifeforce
     time.sleep(1)           #hold 1 second
     print(" ")          #Outputs spacer line
     print("A {0} leaps out at you. Time to fight!".format(enemy[0]))            #Outputs combat initiation statement
@@ -193,102 +211,108 @@ def combat():           #combat function where the combat gameplay takes place
     var = 1         #set var variable to 1 for loop
     
     while var == 1:         #While loop whilst var is equal to 1
-        print("{0} Life Force = {1}       {2} Life Force = {3}".format(name, lifeforce, enemy[0], enemyLifeForce))          #Outputs player lifeforce variable and enemyLifeForce variable
-        print(" ")          #Outputs spacer line
-        time.sleep(2)           #hold 2 seconds
-        command = input("What are you going to do? (type help for a list of battle commands)")          #sets command to input
-            
-        if command.lower() == "stab":         #If command equals attack then:
-            hitluck = random.randint(1,5)           #hitluck is set to a random number between 1 and 5
+        hold2 = 0
+        while hold2 == 0:
+            print("{0} Defense = {1}       {2} Defense = {3}".format(name, defenseTotal, enemy[0], enemyLifeForce))          #Outputs player lifeforce variable and enemyLifeForce variable
+            print(" ")          #Outputs spacer line
+            time.sleep(2)           #hold 2 seconds
+            command = input("What are you going to do? (type help for a list of battle commands)")          #sets command to input
                 
-            if hitluck != 1:            #If hitluck isn't equal to 1 then:
-                enemyLifeForce = enemyLifeForce - weapon[2]         #Takes away the value of the data in position 2 of weapon list from enemyLifeForce variable
+            if command.lower() == "stab":         #If command equals attack then:
+                hold2 = 1           #Sets hold2 to 1 to end loop
+                hitluck = random.randint(1,5)           #hitluck is set to a random number between 1 and 5
+                    
+                if hitluck != 1:            #If hitluck isn't equal to 1 then:
+                    enemyLifeForce = enemyLifeForce - weapon[2]         #Takes away the value of the data in position 2 of weapon list from enemyLifeForce variable
+                    time.sleep(1)           #hold 1 second
+                    print(" ")          #Outputs spacer line
+                    print("Attack Hit! Enemy took {0} damage!".format(weapon[2]))           #Outputs successful hit statement
+                    
+                    if enemyLifeForce <= 0:         #If enemyLifeForce is less than 0 then:
+                        win(enemy)          #Run the win function with parameters: enemy list
+                        live = 0            #Set live to 0 to end loop
+                        var = 0         #Set var to 0 to end while loop
+                        
+                    else:           #If enemyLifeForce is else then:
+                        time.sleep(1)           #hold 1 second
+                        live = 1            #Set live to 1 to continue loop
+                        print(" ")          #Output spacer line
+                    
+                else:           #If hitluck is equal to 1 then:
+                    time.sleep(1)           #hold 1 second
+                    print(" ")          #Output spacer line
+                    print("Attack Missed!")         #Output Attack missed statement
+            
+            elif command.lower() == "swipe":
+                hold2 = 1           #Sets hold2 to 1 to end loop
+                hitluck = random.randint(1,5)           #hitluck is set to a random number between 1 and 5
+                    
+                if hitluck == 1 or hitluck == 2:            #If hitluck isn't equal to 1 then:
+                    hitdamage = weapon[2]*2         #Sets hitdamage to two times the value of the data of weapon list at position 2
+                    enemyLifeForce = enemyLifeForce - hitdamage         #Takes away the value of hitdamage from enemyLifeForce
+                    time.sleep(1)           #hold 1 second
+                    print(" ")          #Outputs spacer line
+                    print("Attack Hit! Enemy took {0} damage!".format(hitdamage))           #Outputs successful hit statement
+                    
+                    if enemyLifeForce <= 0:         #If enemyLifeForce is less than 0 then:
+                        win(enemy)          #Run the win function with parameters: enemy list
+                        live = 0            #Set live to 0 to end loop
+                        var = 0         #Set var to 0 to end while loop
+                        
+                    else:           #If enemyLifeForce is else then:
+                        time.sleep(1)           #hold 1 second
+                        live = 1            #Set live to 1 to continue loop
+                        print(" ")          #Output spacer line
+                    
+                else:           #If hitluck is equal to 1 then:
+                    time.sleep(1)           #hold 1 second
+                    print(" ")          #Output spacer line
+                    print("Attack Missed!")         #Output Attack missed statement
+            
+            elif command.lower() == "flee":         #Else if command is flee then:
+                hold2 = 1           #Sets hold2 to 1 to end loop
+                runluck = random.randint(1,5)           #Sets runluck to a random number between 1 and 5
+                
+                if runluck == 1 or runluck == 2 or runluck == 3:            #If runluck is equal to 1, 2 or 3 then:
+                    time.sleep(1)           #hold 1 second
+                    print(" ")          #Output spacer line
+                    print("Got away safely!")           #Output successful flee statement
+                    var = 0         #Sets var to 0 to end loop
+                    live = 0            #Sets live to 0 to end loop
+                    
+                else:           #If runluck is equal to 4 or 5 then:
+                    time.sleep(1)           #hold 1 second
+                    print(" ")          #Output spacer line
+                    print("You were chased and could not escape!")          #Outputs unsuccessful flee statement
+            
+            elif command.lower() == "help":         #Else if command is help then:
                 time.sleep(1)           #hold 1 second
                 print(" ")          #Outputs spacer line
-                print("Attack Hit! Enemy took {0} damage!".format(weapon[2]))           #Outputs successful hit statement
-                
-                if enemyLifeForce <= 0:         #If enemyLifeForce is less than 0 then:
-                    win(enemy)          #Run the win function with parameters: enemy list
-                    live = 0            #Set live to 0 to end loop
-                    var = 0         #Set var to 0 to end while loop
-                    
-                else:           #If enemyLifeForce is else then:
-                    time.sleep(1)           #hold 1 second
-                    live = 1            #Set live to 1 to continue loop
-                    print(" ")          #Output spacer line
-                
-            else:           #If hitluck is equal to 1 then:
+                print("Commands:")          #Outputs Commands:
+                print(" ")          #Outputs spacer line
                 time.sleep(1)           #hold 1 second
-                print(" ")          #Output spacer line
-                print("Attack Missed!")         #Output Attack missed statement
-        
-        elif command.lower() == "swipe":
-            hitluck = random.randint(1,5)           #hitluck is set to a random number between 1 and 5
-                
-            if hitluck == 1 or hitluck == 2:            #If hitluck isn't equal to 1 then:
-                hitdamage = weapon[2]*2         #Sets hitdamage to two times the value of the data of weapon list at position 2
-                enemyLifeForce = enemyLifeForce - hitdamage         #Takes away the value of hitdamage from enemyLifeForce
+                print("stab (Stab is a higher chance to hit, lower damage attack)")         #Outputs stab message
+                print("swipe (Swipe is a lower chance to hit, higher damage attack)")           #Outputs swipe message
+                print("flee (Attempts to flee battle)")           #Outputs flee
+                print(" ")          #Outputs spacer line
+                time.sleep(1)           #hold 1 second
+            
+            else:           #Else command is else then:
                 time.sleep(1)           #hold 1 second
                 print(" ")          #Outputs spacer line
-                print("Attack Hit! Enemy took {0} damage!".format(hitdamage))           #Outputs successful hit statement
-                
-                if enemyLifeForce <= 0:         #If enemyLifeForce is less than 0 then:
-                    win(enemy)          #Run the win function with parameters: enemy list
-                    live = 0            #Set live to 0 to end loop
-                    var = 0         #Set var to 0 to end while loop
-                    
-                else:           #If enemyLifeForce is else then:
-                    time.sleep(1)           #hold 1 second
-                    live = 1            #Set live to 1 to continue loop
-                    print(" ")          #Output spacer line
-                
-            else:           #If hitluck is equal to 1 then:
-                time.sleep(1)           #hold 1 second
-                print(" ")          #Output spacer line
-                print("Attack Missed!")         #Output Attack missed statement
-        
-        elif command.lower() == "flee":         #Else if command is flee then:
-            runluck = random.randint(1,5)           #Sets runluck to a random number between 1 and 5
-            
-            if runluck == 1 or runluck == 2 or runluck == 3:            #If runluck is equal to 1, 2 or 3 then:
-                time.sleep(1)           #hold 1 second
-                print(" ")          #Output spacer line
-                print("Got away safely!")           #Output successful flee statement
-                var = 0         #Sets var to 0 to end loop
-                live = 0            #Sets live to 0 to end loop
-                
-            else:           #If runluck is equal to 4 or 5 then:
-                time.sleep(1)           #hold 1 second
-                print(" ")          #Output spacer line
-                print("You were chased and could not escape!")          #Outputs unsuccessful flee statement
-        
-        elif command.lower() == "help":         #Else if command is help then:
-            time.sleep(1)           #hold 1 second
-            print(" ")          #Outputs spacer line
-            print("Commands:")          #Outputs Commands:
-            print(" ")          #Outputs spacer line
-            time.sleep(1)           #hold 1 second
-            print("stab (Stab is a higher chance to hit, lower damage attack)")         #Outputs stab message
-            print("swipe (Swipe is a lower chance to hit, higher damage attack)")           #Outputs swipe message
-            print("flee")           #Outputs flee
-            print(" ")          #Outputs spacer line
-            time.sleep(1)           #hold 1 second
-        
-        else:           #Else command is else then:
-            time.sleep(1)           #hold 1 second
-            print(" ")          #Outputs spacer line
-            print("Invalid command")            #Outputs error message
-    
+                print("Invalid command")            #Outputs error message
+                print(" ")          #Outputs spacer line
+
         if live != 0:           #If enemy is alive then:
             enemyluck = random.randint(1,4)         #Sets enemyluck to a random integer between 1 and 4
             
             if enemyluck != 1:          #If enemyluck is not equal to 1 then:
                 lifeforce = lifeforce - enemyDamage         #Subtract the value of enemyDamage from lifeforce global variable
+                defenseTotal = armour[2] + lifeforce
                 time.sleep(1)           #hold 1 second
-                print(" ")          #Outputs spacer line
                 print("You have been hit! You took {0} damage.".format(enemyDamage))            #Outputs successful enemy hit statement
                 
-                if lifeforce <= 0:          #If lifeforce global variable less than or equal to 0 then:
+                if defenseTotal <= 0:          #If lifeforce global variable less than or equal to 0 then:
                     death()         #Runs death function
                     var = 0         #Sets variable to 0 to end loop
                 
